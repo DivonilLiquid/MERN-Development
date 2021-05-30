@@ -2,6 +2,10 @@ const fs = require('fs');
 const http = require('http');
 const url = require('url');
 
+const slugify = require('slugify');
+// used to add slug in an url
+
+
 
 /*          Server           */
 const replaceTemplate = (temp,product) =>{
@@ -35,6 +39,10 @@ const data = fs.readFileSync(`${__dirname}/dev-data/data.json`,'utf-8');
 // storing content of json file in data which converted in javascript object and stored in dataObject
 
 const dataObject = JSON.parse(data);
+
+const slugArray = dataObject.map(el => slugify(el.productName,{lower:true}));
+
+console.log(slugArray);
 const server = http.createServer((req,res)=>{
     const pathName = req.url;
     /**console.log(req.url); => /product?id=0 */
@@ -85,7 +93,6 @@ const server = http.createServer((req,res)=>{
             /*These are Response headers, use to send some metadata about response itself */
         });
         res.end('<h1>404: page not found</h1>');
-        // see we are sending string html in form of output format
     }
     
 });
