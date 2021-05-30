@@ -38,7 +38,7 @@ const dataObject = JSON.parse(data);
 const server = http.createServer((req,res)=>{
     const pathName = req.url;
     /**console.log(req.url); => /product?id=0 */
-    // console.log('URL.PARSE',url.parse(req.url,true));        
+
 
 
     const {query,pathname} = url.parse(req.url,true);   //Destructruing
