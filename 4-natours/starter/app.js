@@ -15,6 +15,8 @@ app.use(morgan('dev'));                                             //Concise ou
 
 app.use(express.json());                                            //middleware used to modify incoming responses
 
+app.use(express.static(`${__dirname}/public`));                     //static file path where url will be -> http://127.0.0.1:3000/overview.html
+
 app.use((req, res, next)=>{
     console.log('Hello from own middleware 👋🏻');
     req.requestTime = new Date().toISOString();                     // new Date() is a constructor
