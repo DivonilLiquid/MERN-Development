@@ -8,8 +8,7 @@ const tourRoute = require('./route/tourRouter');
 const userRoute = require('./route/userRouter');
 
 // 2) Middlewares
-
-app.use(morgan('dev')); //Concise output colored by response status for development use. The :status token will be colored red for server error codes, yellow for client error codes, cyan for redirection codes, and uncolored for all other codes.
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev')); //Concise output colored by response status for development use. The :status token will be colored red for server error codes, yellow for client error codes, cyan for redirection codes, and uncolored for all other codes.
 
 app.use(express.json()); //middleware used to modify incoming responses
 
