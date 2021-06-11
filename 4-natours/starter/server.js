@@ -1,6 +1,22 @@
+const mongoose = require('mongoose');
+
 const dotenv = require('dotenv');
 
 dotenv.config({ path: `./config.env` });
+const DB = process.env.DataBase.replace(
+  '<password>',
+  process.env.DataBasePassword
+);
+mongoose
+  .connect(DB, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  })
+  .then((connection) => {
+    console.log(connection.connection);
+    console.log('DB connection established!!');
+  });
 
 const app = require('./app');
 
