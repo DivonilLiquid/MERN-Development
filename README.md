@@ -1,4 +1,4 @@
-# Course Material and FAQ for my Complete Node.js, Express and MongoDB Bootcamp
+# My Complete Node.js, Express and MongoDB PROJECT'S with FAQ 
 
 This repo contains starter files and the finished project files for all the projects of my MERN DEVELOPMENT (complete repo size is **288MB**).
 
