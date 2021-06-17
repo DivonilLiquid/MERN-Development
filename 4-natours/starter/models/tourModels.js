@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 //have made tourSchema
+//update your schema
 const tourSchema = new mongoose.Schema({
   name: {
     type: String,
