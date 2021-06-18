@@ -1,6 +1,6 @@
 const Tour = require('../models/tourModels');
 
-console.log(Tour);
+//console.log(Tour);
 // exports.mymiddleware = (req, res, next) => {
 //   if (!req.body.name || !req.body.price) {
 //     return res.status(404).json({
@@ -12,8 +12,18 @@ console.log(Tour);
 // };
 exports.getTours = async (req, res) => {
   //http method get used to get the infromation
+  console.log(req.query, queryObj); //object with key value pair of request one wants to see
+  
   try {
-    const allTours = await Tour.find();
+    //Build Query
+    const queryObj = {...req.query} //shallow copy using destructuring
+    const excludedFields = ['page','sort','limit','fields'];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    //Query
+    const allTours = await Tour.find(queryObj);
+
+    //Send response
     res.status(200).json({
       status: 'success',
       data: { allTours },
@@ -31,7 +41,7 @@ exports.getTours = async (req, res) => {
 exports.getTour = async (req, res) => {
   //:id is used to declare a parameter, if you want to declare a set of parameters out of which some are optional then we use ? with that argument
   try {
-    console.log(req.params.id);
+    //console.log(req.params.id);
     const tour = await Tour.findById(req.params.id);
     // console.log(id);
     // const id = req.params.id * 1;
@@ -91,9 +101,22 @@ exports.updateTour = async (req, res) => {
   }
 };
 
-exports.deleteTour = (req, res) => {
-  res.status(204).json({
-    status: 'success',
-    message: 'deleted',
-  });
+exports.deleteTour = async (req, res) => {
+  try {
+    await Tour.findByIdAndDelete(req.params.id);
+    // console.log(id);
+    // const id = req.params.id * 1;
+    // const tour = tours.find((el) => el.id === id);
+    res.status(200).json({
+      status: 'success',
+      message: 'Deleted',
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      error: {
+        err,
+      },
+    });
+  }
 };
