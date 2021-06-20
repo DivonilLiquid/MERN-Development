@@ -12,21 +12,45 @@ const Tour = require('../models/tourModels');
 // };
 exports.getTours = async (req, res) => {
   //http method get used to get the infromation
-  console.log(req.query, queryObj); //object with key value pair of request one wants to see
-  
+  //console.log(req.query, queryObj); //object with key value pair of request one wants to see
   try {
     //Build Query
-    const queryObj = {...req.query} //shallow copy using destructuring
-    const excludedFields = ['page','sort','limit','fields'];
+    //1A)Filtering
+    const queryObj = { ...req.query }; //shallow copy using destructuring
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
+    //1B) Advanced filtering
+    let query = JSON.stringify(queryObj);
+    query = query.replace(
+      /\b(gt|gte|lt|lte)\b/g,
+      (matchedString) => `$${matchedString}`
+    );
 
-    //Query
-    const allTours = await Tour.find(queryObj);
+    //ExecuteQuery
+    let allTours = Tour.find(JSON.parse(query));
+    //2)Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      console.log(sortBy);
+      allTours = allTours.sort(sortBy);
+    } else {
+      allTours = allTours.sort('ratingsAverage');
+    }
 
+    //3)Limiting fields
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      console.log(fields);
+      allTours = allTours.select(fields); //selecting selected fields is called projecting
+    } else {
+      allTours = allTours.select('-__v');
+    }
+    const tours = await allTours;
     //Send response
     res.status(200).json({
       status: 'success',
-      data: { allTours },
+      size: tours.length,
+      data: { tours },
     });
   } catch (err) {
     res.status(400).json({
