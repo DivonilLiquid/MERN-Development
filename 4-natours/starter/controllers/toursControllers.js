@@ -45,6 +45,13 @@ exports.getTours = async (req, res) => {
     } else {
       allTours = allTours.select('-__v');
     }
+
+    // 4)Pagination
+    const pageNumber = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (pageNumber - 1) * limit;
+    allTours = allTours.skip(skip).limit(limit);
+
     const tours = await allTours;
     //Send response
     res.status(200).json({
