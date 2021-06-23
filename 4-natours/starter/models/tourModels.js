@@ -93,6 +93,15 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
+//Aggregation middleware -> middleware which acts on the currently processed Aggregation
+//before an event .find()
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  //unshift is to add in the beginning of the pipeline function
+  //adding a match object in pipeline where secretTour should be equal to false
+  next();
+});
+
 // //after all pre middleware functions are executed
 // tourSchema.post('save', (doc, next) => {
 //   //no access to this keyword, using doc as a finsih document here

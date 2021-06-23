@@ -113,11 +113,11 @@ exports.getTourStats = async (req, res) => {
       {
         $sort: { avgPrice: 1 },
       },
-      {
-        $match: {
-          _id: { $ne: 'easy' }, //all groups except the group which has difficulty equals to easy
-        },
-      },
+      // {
+      //   $match: {
+      //     _id: { $ne: 'easy' }, //all groups except the group which has difficulty equals to easy
+      //   },
+      // },
     ]);
     res.status(200).json({
       status: 'success',
