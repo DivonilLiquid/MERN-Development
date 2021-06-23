@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 //have made tourSchema
 //update your schema
 const slugify = require('slugify');
+//const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -10,6 +11,9 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour should have a name'], //A validator
       unique: true,
       trim: true,
+      maxlength: [40, 'A tour must have less or equal than 40 char'],
+      minlength: [10, 'A tour must have more or equal than 10 char'],
+      //validate: [validator.isAlpha, 'A tour name must have alpha characters'],
     },
     duration: {
       type: Number,
@@ -22,11 +26,17 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, 'A tour should have a difficulty'],
+      enum: {
+        values: ['easy', 'medium', 'difficulty'],
+        message: 'Difficulty can be easy, medium, difficulty',
+      },
     },
 
     ratingsAverage: {
       type: Number,
       default: 4.5,
+      min: [1, 'A rating must be more then 1'],
+      max: [5, 'A rating must be less then 5'],
     },
     ratingsQuantity: {
       type: Number,
@@ -36,7 +46,18 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour should have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      //custom validator
+      validate:{ 
+        validator: function (val) {
+          //need access to this function
+          //this only points to current doc on New documetn creation
+          return val < this.price;
+        },
+        message: 'Discount should be less then price',
+      }
+    },
     summary: {
       type: String,
       trim: true, //Remove all the white space in begining and end
@@ -77,7 +98,7 @@ tourSchema.virtual('durationWeeks').get(function () {
 });
 
 //Document middleware -> middleware which acts on the currently processed document
-//before an event .save() and .create() but not on .insertMany()
+//before an event .save() and .create() but not on .insertMany() and update
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
