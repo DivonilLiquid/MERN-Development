@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 //have made tourSchema
 //update your schema
+const slugify = require('slugify');
+
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -55,6 +57,7 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date], //array of dates
+    slug: String,
   },
   {
     toJSON: { virtuals: true },
@@ -69,5 +72,17 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+//Document middleware -> middleware which acts on the currently processed document
+//before an event .save() and .create() but not on .insertMany()
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+//after all pre middleware functions are executed
+tourSchema.post('save', (doc, next) => {
+  //no access to this keyword, using doc as a finsih document here
+  console.log(doc);
+  next();
+});
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;
