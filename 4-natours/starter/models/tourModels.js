@@ -58,6 +58,10 @@ const tourSchema = new mongoose.Schema(
     },
     startDates: [Date], //array of dates
     slug: String,
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -78,11 +82,22 @@ tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
-//after all pre middleware functions are executed
-tourSchema.post('save', (doc, next) => {
-  //no access to this keyword, using doc as a finsih document here
-  console.log(doc);
+
+//query middleware -> middleware which acts on the currently processed query
+//before an event .find()
+tourSchema.pre(/^find/, function (next) {
+  // this /^find/ will make sure that whatever query which start will find, will run this middleware
+  //this will be pointing on the query
+  this.find({ secretTour: { $ne: true } });
+  //will send all the data where value of secretTour is false
   next();
 });
+
+// //after all pre middleware functions are executed
+// tourSchema.post('save', (doc, next) => {
+//   //no access to this keyword, using doc as a finsih document here
+//   console.log(doc);
+//   next();
+// });
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;
