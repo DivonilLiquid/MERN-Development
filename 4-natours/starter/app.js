@@ -27,5 +27,27 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
+//if no route is defined till here, then it the route defined below will get executed.
+app.all('*', (req, res, next) => {
+  // res.status(404).json({
+  //   status: 'fail',
+  //   message: `Can't find ${req.originalUrl} on server`,
+  // });
+  const err = new Error(`Can't find ${req.originalUrl} on server`);
+  //error message has been initialised
+  err.statusCode = 404;
+  err.status = 'fail';
+  next(err);
+});
+
+//global error handling middleware
+app.use((err, req, res, next) => {
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || 'error';
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: `Can't find ${req.originalUrl} on server`,
+  });
+});
 
 module.exports = app;

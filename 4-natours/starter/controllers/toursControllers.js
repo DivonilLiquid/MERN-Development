@@ -3,7 +3,11 @@ const APIFeatures = require('../utils/APIFeatures');
 
 exports.getTours = async (req, res) => {
   try {
-    const features = new APIFeatures(Tour.find(), req.query).filter();
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limit()
+      .paginate();
     const tours = await features.query;
     //Send response
     res.status(200).json({
