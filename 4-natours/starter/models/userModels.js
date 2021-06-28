@@ -1,14 +1,54 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'A user should have a name'],
   },
-  email: String,
+  email: {
+    type: String,
+    required: [true, 'A user should have a email'],
+    unique: true,
+    lowercase: true, //divonil_liquid@gmail.com all will be in lowercase
+    validate: [validator.isEmail, 'Please provide a valid email'],
+  },
   photo: String,
-  password: String,
-  passwordConfirm: String,
+  password: {
+    type: String,
+    required: [true, 'A user should have a password'],
+    minlength: 8,
+    select: false,
+  },
+  passwordConfirm: {
+    type: String,
+    required: [true, 'Please confirm your password'],
+    validate: {
+      //gets executed when current document will be saved.
+      validator: function (el) {
+        //this only works for save and create
+        return el === this.password;
+      },
+      message: 'Password are not same',
+    },
+  },
 });
-const userModel = mongoose.Model('userModel', userSchema);
+
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next(); // If the pw has not been modified, then return
+  // If the pw has been modified, then hash the password -> if 2 passwords are same, then their hash value will be different as well as hash value will be secured
+  this.password = await bcrypt.hash(this.password, 12); //async version
+  this.passwordConfirm = undefined; //till here we have make it sure that pw and pwc are same, so removing pwc
+  next();
+});
+//instance method
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userpassword
+) {
+  return await bcrypt.compare(candidatePassword, userpassword);
+};
+
+const userModel = mongoose.model('userModel', userSchema);
 module.exports = userModel;

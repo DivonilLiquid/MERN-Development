@@ -2,9 +2,15 @@
 const express = require('express');
 
 const router = express.Router();
-const userController = require(`${__dirname}/../controllers/userControllers`);
+const userController = require(`../controllers/userControllers`);
 
-router.param('id', userController.CheckID);
+const authController = require(`../controllers/authController`);
+// const { route } = require('../app');
+
+router.post('/signup', authController.signup);
+router.post('/login', authController.login);
+
+// router.param('id', userController.CheckID);
 
 router.route('/').get(userController.getUsers).post(userController.addUser);
 

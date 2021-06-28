@@ -15,6 +15,10 @@ app.use(express.json()); //middleware used to modify incoming responses
 
 app.use(express.static(`${__dirname}/public`)); //static file path where url will be -> http://127.0.0.1:3000/overview.html
 
+app.use((req, res,next) => {
+  console.log(req.headers);
+  next();
+});
 app.get('/', (req, res) => {
   //http method get used to get the infromation
   res.status(200).send('Hello response from server');

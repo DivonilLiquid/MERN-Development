@@ -1,28 +1,13 @@
-const fs = require('fs');
+const User = require('../models/userModels');
+const catchAsync = require('../utils/catchAsync');
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-);
-// implement param middleware to checkid
-
-exports.CheckID = (req, res, next, val) => {
-  console.log(`user id is ${val}`);
-  const id = req.params.id * 1;
-  if (id >= tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Error',
-    });
-  }
-  next();
-};
-
-exports.getUsers = (req, res) => {
+exports.getUsers = catchAsync(async (req, res) => {
+  const users = await User.find();
   res.status(500).send({
     status: 'fail',
-    message: 'server not defined',
+    data: users,
   });
-};
+});
 exports.addUser = (req, res) => {
   res.status(500).send({
     status: 'fail',
