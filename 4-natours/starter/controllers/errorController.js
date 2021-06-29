@@ -34,7 +34,8 @@ const sendErrorProd = (err, res) => {
       status: err.status,
       message: err.message,
     });
-  } else {
+  } //Unknown error
+  else {
     //console.error('Error 💥', err);
     res.status(500).json({
       status: 'failed',
@@ -42,6 +43,11 @@ const sendErrorProd = (err, res) => {
     });
   }
 };
+const handleJsonWebTokenError = () =>
+  new AppError('You are not logged in, Please login', 401);
+
+const handleTokenExpiredError = () =>
+  new AppError('Your token has expired, login again', 401);
 
 module.exports = (err, req, res, next) => {
   // console.log(err.stack);
@@ -64,6 +70,9 @@ module.exports = (err, req, res, next) => {
       console.log('Found validator');
       error = handleValidationErrorDB(error);
     }
+    //jwt errors
+    if (err.name === 'JsonWebTokenError') error = handleJsonWebTokenError();
+    if (err.name === 'TokenExpiredError') error = handleTokenExpiredError();
     sendErrorProd(error, res);
   }
 };
