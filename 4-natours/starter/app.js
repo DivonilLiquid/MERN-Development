@@ -1,6 +1,11 @@
 const express = require('express');
 
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const app = express(); //express() is a function which on calling adds bunch of method in app
 const AppError = require('./utils/appError');
@@ -8,14 +13,51 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRoute = require('./route/tourRouter');
 const userRoute = require('./route/userRouter');
 
-// 2) Middlewares
+// 1) Global Middlewares
+//set securing http headers
+app.use(helmet());
+
+//development logging
 app.use(morgan('dev')); //Concise output colored by response status for development use. The :status token will be colored red for server error codes, yellow for client error codes, cyan for redirection codes, and uncolored for all other codes.
 
-app.use(express.json()); //middleware used to modify incoming responses
+//denial of service, to stop brute force attack ->limtit request
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'to many requests from this ip, try after an hour',
+});
 
+app.use('/api', limiter);
+
+// Body parser, reading data from body into req.body
+app.use(express.json({ limit: '10kb' })); //middleware used to modify incoming responses
+
+//data santiziation against nosql query injection
+app.use(mongoSanitize());
+
+//data santiziation against xss
+app.use(xss());
+
+//prevent parameter pollution
+app.use(
+  hpp({
+    // whitelist
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  })
+);
+
+//serving static file
 app.use(express.static(`${__dirname}/public`)); //static file path where url will be -> http://127.0.0.1:3000/overview.html
 
-app.use((req, res,next) => {
+//test middleware
+app.use((req, res, next) => {
   console.log(req.headers);
   next();
 });

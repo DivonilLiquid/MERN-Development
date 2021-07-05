@@ -42,6 +42,17 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetTokenExpIn: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
+});
+
+//query middleware to hide user who's active key is false
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
+  next();
 });
 
 userSchema.pre('save', async function (next) {
@@ -52,10 +63,10 @@ userSchema.pre('save', async function (next) {
   next();
 });
 userSchema.pre('save', async function (next) {
-  if(!this.isModified('password') || this.isNew) return next();
+  if (!this.isModified('password') || this.isNew) return next();
   this.passwordChangedAt = Date.now() - 1000;
   next();
-})
+});
 //instance method
 userSchema.methods.correctPassword = async function (
   candidatePassword,
@@ -83,7 +94,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
-  console.log({resetToken},this.passwordResetToken);
+  console.log({ resetToken }, this.passwordResetToken);
   this.passwordResetTokenExpIn = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };
