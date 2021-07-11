@@ -12,6 +12,7 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRoute = require('./route/tourRouter');
 const userRoute = require('./route/userRouter');
+const reviewRoute = require('./route/reviewRouter');
 
 // 1) Global Middlewares
 //set securing http headers
@@ -68,6 +69,8 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
+app.use('/api/v1/review', reviewRoute);
+
 //if no route is defined till here, then it the route defined below will get executed.
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on server`, 404));

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 //have made tourSchema
 //update your schema
 const slugify = require('slugify');
-const User = require('./userModels');
+// const User = require('./userModels');
 //const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
@@ -109,7 +109,11 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: Array,
+    guides: [
+      //schema type, Id works and not ID
+      { type: mongoose.Schema.ObjectId, ref: 'userModel' },
+      //A tour will reference all the users data
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -123,18 +127,16 @@ tourSchema.virtual('durationWeeks').get(function () {
   //arrow function doesn't have access to this keyword
   return this.duration / 7;
 });
+tourSchema.virtual('review', {
+  ref: 'review',
+  foreignField: 'tour',
+  localField: '_id',
+});
 
 //Document middleware -> middleware which acts on the currently processed document
 //before an event .save() and .create() but not on .insertMany() and update
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
-  next();
-});
-tourSchema.pre('save', async function (next) {
-  const guidesPromises = this.guides.map(async id => await User.findById(id));
-  this.guides = await Promise.all(guidesPromises);
-  //creating new tour will embedd(embedding) the user data in tour model
-  // drawback is on updating a tour
   next();
 });
 
@@ -145,6 +147,14 @@ tourSchema.pre(/^find/, function (next) {
   //this will be pointing on the query
   this.find({ secretTour: { $ne: true } });
   //will send all the data where value of secretTour is false
+  next();
+});
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -email -_id -passwordChangedAt',
+  });
+  //populate will populate out guides key in tour schema, populate creates a new query
   next();
 });
 

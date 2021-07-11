@@ -1,6 +1,7 @@
 const User = require('../models/userModels');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const handlerFunction = require('./handlerFactory');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -39,34 +40,12 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     data: updatedUser,
   });
 });
-exports.getUsers = catchAsync(async (req, res) => {
-  const users = await User.find();
-  res.status(500).send({
-    status: 'fail',
-    data: users,
-  });
-});
-exports.addUser = (req, res) => {
-  res.status(500).send({
-    status: 'fail',
-    message: 'server not defined',
-  });
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
 };
-exports.getUser = (req, res) => {
-  res.status(500).send({
-    status: 'fail',
-    message: 'server not defined',
-  });
-};
-exports.updateUser = (req, res) => {
-  res.status(500).send({
-    status: 'fail',
-    message: 'server not defined',
-  });
-};
-exports.deleteUser = (req, res) => {
-  res.status(500).send({
-    status: 'fail',
-    message: 'server not defined',
-  });
-};
+exports.getUser = handlerFunction.getOne(User);
+exports.getUsers = handlerFunction.getAll(User);
+//not for update password
+exports.updateUser = handlerFunction.updateOne(User);
+exports.deleteUser = handlerFunction.deleteOne(User);
