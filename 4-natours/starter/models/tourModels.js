@@ -1,3 +1,4 @@
+const { contentSecurityPolicy } = require('helmet');
 const mongoose = require('mongoose');
 //have made tourSchema
 //update your schema
@@ -38,6 +39,7 @@ const tourSchema = new mongoose.Schema(
       default: 4.5,
       min: [1, 'A rating must be more then 1'],
       max: [5, 'A rating must be less then 5'],
+      set: (val) => Math.round(val * 10) / 10,
     },
     ratingsQuantity: {
       type: Number,
@@ -120,6 +122,10 @@ const tourSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+// tourSchema.index({ price: 1 });
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' });
 //extracting model from tourSchema
 
 //virtual properties on tourSchema
@@ -160,12 +166,13 @@ tourSchema.pre(/^find/, function (next) {
 
 //Aggregation middleware -> middleware which acts on the currently processed Aggregation
 //before an event .find()
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  //unshift is to add in the beginning of the pipeline function
-  //adding a match object in pipeline where secretTour should be equal to false
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   //unshift is to add in the beginning of the pipeline function
+//   //adding a match object in pipeline where secretTour should be equal to false
+//   console.log(this.pipeline());
+//   next();
+// });
 
 // //after all pre middleware functions are executed
 // tourSchema.post('save', (doc, next) => {

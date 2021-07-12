@@ -20,9 +20,16 @@ router.use('/:tourId/reviews', reviewRouter);
 router.route('/tour-stats').get(tourController.getTourStats);
 router.route('/monthly-plan/:id').get(tourController.getMonthlyPlan);
 
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin);
+// /tours-within?distance=233&center=-40,45&unit=mi
+//tours-within/233/center/-40,45/unit/mi
 router
   .route('/')
-  .get(authController.protect, tourController.getTours)
+  .get(tourController.getTours)
   .post(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
