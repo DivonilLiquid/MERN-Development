@@ -1,5 +1,5 @@
 const express = require('express');
-
+const path = require('path');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
@@ -13,8 +13,14 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRoute = require('./route/tourRouter');
 const userRoute = require('./route/userRouter');
 const reviewRoute = require('./route/reviewRouter');
+const viewRoute = require('./route/viewRoutes');
 
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 // 1) Global Middlewares
+//serving static file
+//static file path where url will be -> http://127.0.0.1:3000/overview.html
+app.use(express.static(path.join(__dirname, 'public')));
 //set securing http headers
 app.use(helmet());
 
@@ -54,19 +60,17 @@ app.use(
   })
 );
 
-//serving static file
-app.use(express.static(`${__dirname}/public`)); //static file path where url will be -> http://127.0.0.1:3000/overview.html
-
 //test middleware
 app.use((req, res, next) => {
   console.log(req.headers);
   next();
 });
-app.get('/', (req, res) => {
-  //http method get used to get the infromation
-  res.status(200).send('Hello response from server');
-});
+// app.get('/', (req, res) => {
+//   //http method get used to get the infromation
+//   res.status(200).send('Hello response from server');
+// });
 
+app.use('/', viewRoute);
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/review', reviewRoute);
