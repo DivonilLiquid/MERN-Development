@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 
+const cookieParser = require('cookie-parser');
 const app = express(); //express() is a function which on calling adds bunch of method in app
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -38,7 +39,7 @@ app.use('/api', limiter);
 
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' })); //middleware used to modify incoming responses
-
+app.use(cookieParser());
 //data santiziation against nosql query injection
 app.use(mongoSanitize());
 
@@ -62,7 +63,7 @@ app.use(
 
 //test middleware
 app.use((req, res, next) => {
-  console.log(req.headers);
+  console.log(req.cookies);
   next();
 });
 // app.get('/', (req, res) => {

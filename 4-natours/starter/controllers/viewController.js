@@ -11,8 +11,33 @@ exports.getOverview = catchAsync(async (req, res) => {
     tours,
   });
 });
-exports.getTour = (req, res) => {
-  res.status(200).render('tour', {
-    title: 'The forest hiker',
+exports.login = catchAsync(async (req, res) => {
+  res
+    .status(200)
+    .set(
+      'Content-Security-Policy',
+      "connect-src 'self' https://cdnjs.cloudflare.com"
+    )
+    .render('login');
+});
+exports.signUp = catchAsync(async (req, res) => {
+  res.status(200).render('signUp');
+});
+exports.getTour = catchAsync(async (req, res) => {
+  const tour = await Tour.findOne({ slug: req.params.slug }).populate({
+    path: 'review',
+    fields: 'review rating user',
   });
-};
+  // console.log(tour);
+  console.log(tour.name);
+  res
+    .status(200)
+    .set(
+      'Content-Security-Policy',
+      'connect-src https://*.tiles.mapbox.com https://api.mapbox.com https://events.mapbox.com'
+    )
+    .render('tour', {
+      title: tour.name,
+      tour,
+    });
+});
