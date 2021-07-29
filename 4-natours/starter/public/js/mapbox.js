@@ -1,7 +1,7 @@
 /* eslint-disable */
-console.log('Hello from the server side :D');
+// console.log('Hello from the server side :D');
 const locations = JSON.parse(document.getElementById('map').dataset.locations);
-console.log(locations);
+// console.log(locations);
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGl2b25pbGxpcXVpZCIsImEiOiJja3I0bWR4a2gwenpsMnZwZDV3NnBma2RxIn0._2GP32XGDLdQOEhx1x590g';
 var map = new mapboxgl.Map({
 container: 'map',
