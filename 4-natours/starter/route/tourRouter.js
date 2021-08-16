@@ -4,7 +4,8 @@ const authController = require('../controllers/authController');
 
 const reviewRouter = require('./reviewRouter');
 
-const tourController = require(`${__dirname}/../controllers/toursControllers`);
+const tourController = require('./../controllers/toursControllers');
+
 const router = express.Router();
 
 //router.param('id', tourController.CheckID);

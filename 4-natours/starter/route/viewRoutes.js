@@ -1,6 +1,6 @@
 const express = require('express');
 const viewController = require('../controllers/viewController');
-// const authController = require('../controllers/authController');
+const authController = require('../controllers/authController');
 
 const router = express.Router();
 // router.get('/', (req, res) => {
@@ -11,7 +11,7 @@ const router = express.Router();
 // });
 router.get('/', viewController.getOverview);
 // router.get('/tours', viewController.getTour);
-router.get('/tour/:slug', viewController.getTour);
+router.get('/tour/:slug', authController.protect, viewController.getTour);
 router.get('/login', viewController.login);
 router.get('/signup', viewController.signUp);
 module.exports = router;
