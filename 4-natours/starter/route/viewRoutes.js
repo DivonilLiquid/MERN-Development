@@ -9,9 +9,10 @@ const router = express.Router();
 //     name: 'divonil',
 //   });
 // });
+router.use(authController.isLoggedIn);
 router.get('/', viewController.getOverview);
 // router.get('/tours', viewController.getTour);
-router.get('/tour/:slug', authController.protect, viewController.getTour);
+router.get('/tour/:slug', viewController.getTour);
 router.get('/login', viewController.login);
 router.get('/signup', viewController.signUp);
 module.exports = router;
